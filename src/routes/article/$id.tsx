@@ -42,7 +42,6 @@ export default function Index() {
           >
             logout
           </button>
-          <Link to={`/`}>regresar</Link>
         </>
       ) : (
         <Link
@@ -54,6 +53,7 @@ export default function Index() {
           iniciar sesion
         </Link>
       )}
+      <Link to={`/`}>regresar</Link>
 
       <div
         style={{
