@@ -1,8 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
-import { IQueryFilter } from '@ixulabs/ui';
 import CONFIG from '~/config';
 import { USER } from '~/apollo/query/user';
 import { createBearer } from '~/routes/login';
+import { IQueryFilter } from '~/types';
 
 export const GraphQLME = async (request: Request) => {
   const bearer = await createBearer.parse(request.headers.get('Cookie') ?? '');

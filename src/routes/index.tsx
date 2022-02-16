@@ -1,9 +1,3 @@
-import {
-  IArticle,
-  ICreateArticleInput,
-  IMember,
-  IMutationFilter
-} from '@ixulabs/ui';
 import { GraphQLClient } from 'graphql-request';
 import Cookies from 'js-cookie';
 import * as cookie from 'cookie';
@@ -20,6 +14,12 @@ import {
 import AuthAdmin from '~/auth/_admin';
 import CONFIG from '~/config';
 import { CREATEARTICLES } from '~/apollo/mutation/articles';
+import {
+  IArticle,
+  ICreateArticleInput,
+  IMember,
+  IMutationFilter
+} from '~/types';
 
 export const meta: MetaFunction = ({ data }) => {
   const user = data as useLoaderDataType;

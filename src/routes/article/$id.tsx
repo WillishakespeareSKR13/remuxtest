@@ -1,7 +1,7 @@
-import { IArticle, IMember } from '@ixulabs/ui';
 import Cookies from 'js-cookie';
 import { useLoaderData, LoaderFunction, MetaFunction, Link } from 'remix';
 import AuthArticle from '~/auth/_article';
+import { IArticle, IMember } from '~/types';
 
 export const meta: MetaFunction = ({ data }) => {
   const user = data as useLoaderDataType;

@@ -11,9 +11,9 @@ import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import * as cookie from 'cookie';
 import CONFIG from '~/config';
-import { IMutationFilter } from '@ixulabs/ui';
 import { LOGIN } from '~/apollo/mutation/login';
 import AuthLogin from '~/auth/_login';
+import { IMutationFilter } from '~/types';
 
 const Wrapper = styled(motion.div)`
   display: flex;

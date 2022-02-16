@@ -1,9 +1,9 @@
-import { IQueryFilter } from '@ixulabs/ui';
 import { GraphQLClient } from 'graphql-request';
 import { LoaderFunction, redirect } from 'remix';
 import { ARTICLES, GETARTICLEBYID } from '~/apollo/query/articles';
 import CONFIG from '~/config';
 import { createBearer } from '~/routes/login';
+import { IQueryFilter } from '~/types';
 import { GraphQLME } from './__auth';
 
 const AuthArticle: LoaderFunction = async ({ request, params }) => {
