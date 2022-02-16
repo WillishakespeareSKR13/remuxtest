@@ -25,9 +25,9 @@ export const meta: MetaFunction = ({ data }) => {
   const user = data as useLoaderDataType;
   const { me } = user;
   return {
-    title: `${me?.profile.firstName} ${me?.profile.lastName}`,
-    description: `${me?.profile.firstName} ${me?.profile.lastName}`,
-    image: me?.profile.photo
+    title: `${me?.profile?.firstName} ${me?.profile?.lastName}`,
+    description: `${me?.profile?.firstName} ${me?.profile?.lastName}`,
+    image: `${me?.profile?.photo}`
   };
 };
 export const loader: LoaderFunction = async (data) => AuthAdmin(data);
@@ -82,28 +82,33 @@ export default function Index() {
   const { me, articles } = data;
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
-      <h1>Welcome to {me.profile.firstName}</h1>
-      <p>{JSON.stringify(me)}</p>
-      <button
-        onClick={() => {
-          Cookies.remove('bearer');
-          window.location.reload();
-        }}
-      >
-        logout
-      </button>
-      <div>
-        <h1>Agregar articulo</h1>
-        <Form method="post">
-          <input type="text" placeholder="Titulo" name="title" />
-          <input type="text" placeholder="Contenido" name="content" />
-          <button type="submit" disabled={!!transition.submission}>
-            {transition.state === 'idle'
-              ? 'Crear Articulo'
-              : 'Creando Articulo...'}
+      {me.id && (
+        <>
+          <h1>Welcome to {me?.profile?.firstName}</h1>
+          <p>{JSON.stringify(me)}</p>
+          <button
+            onClick={() => {
+              Cookies.remove('bearer');
+              window.location.reload();
+            }}
+          >
+            logout
           </button>
-        </Form>
-      </div>
+
+          <div>
+            <h1>Agregar articulo</h1>
+            <Form method="post">
+              <input type="text" placeholder="Titulo" name="title" />
+              <input type="text" placeholder="Contenido" name="content" />
+              <button type="submit" disabled={!!transition.submission}>
+                {transition.state === 'idle'
+                  ? 'Crear Articulo'
+                  : 'Creando Articulo...'}
+              </button>
+            </Form>
+          </div>
+        </>
+      )}
       <div
         style={{
           display: 'flex',

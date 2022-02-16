@@ -26,14 +26,14 @@ const AuthAdmin: LoaderFunction = async ({ request }) => {
         createdAt: 'DESC'
       }
     })
-    .catch(() => null);
+    .catch((e) => e.response.data);
 
-  if (!me) {
-    return redirect('/login');
-  }
+  // if (!me) {
+  //   return redirect('/login');
+  // }
 
   return {
-    me,
+    me: me ?? {},
     articles: query?.listArticles?.items ?? []
   };
 };

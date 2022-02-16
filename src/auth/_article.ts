@@ -10,9 +10,7 @@ const AuthArticle: LoaderFunction = async ({ request, params }) => {
   const me = await GraphQLME(request);
   const bearer = await createBearer.parse(request.headers.get('Cookie') ?? '');
   const graphQLClient = new GraphQLClient(CONFIG.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${bearer}`
-    }
+    headers: {}
   });
 
   const query = await graphQLClient
@@ -20,14 +18,14 @@ const AuthArticle: LoaderFunction = async ({ request, params }) => {
       id: params.id,
       viewed: false
     })
-    .catch(() => null);
+    .catch((e) => e.response.data);
 
-  if (!me) {
-    return redirect('/login');
-  }
+  // if (!me) {
+  //   return redirect('/login');
+  // }
 
   return {
-    me,
+    me: me ?? {},
     article: query?.articleById ?? {}
   };
 };

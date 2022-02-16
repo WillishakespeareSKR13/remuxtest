@@ -31,7 +31,7 @@ export default function Index() {
         flexDirection: 'column'
       }}
     >
-      <h1>Welcome to {me.profile.firstName}</h1>
+      <h1>Welcome to {me?.profile?.firstName}</h1>
       <button
         onClick={() => {
           Cookies.remove('bearer');
