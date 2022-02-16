@@ -1,6 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
 import Cookies from 'js-cookie';
-import * as cookie from 'cookie';
 import {
   useLoaderData,
   LoaderFunction,
@@ -20,6 +19,7 @@ import {
   IMember,
   IMutationFilter
 } from '~/types';
+import { createBearer } from './login';
 
 export const meta: MetaFunction = ({ data }) => {
   const user = data as useLoaderDataType;
@@ -36,26 +36,26 @@ export const action: ActionFunction = async (DataFunction) => {
   const { request } = DataFunction;
   const formData = await request.formData();
 
-  const title = formData.get('username');
-  const content = formData.get('password');
+  const title = formData.get('title');
+  const content = formData.get('content');
+  const image = formData.get('image');
 
-  const getCookie = request.headers.get('Cookie');
-  const bearer = cookie.parse(getCookie || '').bearer;
+  const bearer = await createBearer.parse(request.headers.get('Cookie') ?? '');
   const graphQLClient = new GraphQLClient(CONFIG.GRAPHQL_URL, {
     headers: {
       authorization: `Bearer ${bearer}`
     }
   });
 
-  await graphQLClient
+  const query = await graphQLClient
     .request<IMutationFilter<'loginMember'>>(CREATEARTICLES, {
       input: {
         projectId: 'b6341425-7c7b-45bd-939a-dc15db168d62',
         categories: [],
-        title: '',
+        title: `${title}`,
         tags: [],
-        photo: '',
-        content: '',
+        photo: `${image}`,
+        content: `${content}`,
         slug: '',
         seoTitle: '',
         seoDescription: '',
@@ -66,7 +66,8 @@ export const action: ActionFunction = async (DataFunction) => {
         imageAlt: ''
       } as ICreateArticleInput
     })
-    .catch(() => null);
+    .catch((e) => e.response.data);
+  console.log(query);
 
   return redirect('/login');
 };
@@ -100,6 +101,7 @@ export default function Index() {
             <Form method="post">
               <input type="text" placeholder="Titulo" name="title" />
               <input type="text" placeholder="Contenido" name="content" />
+              <input type="text" placeholder="Imagen" name="image" />
               <button type="submit" disabled={!!transition.submission}>
                 {transition.state === 'idle'
                   ? 'Crear Articulo'
