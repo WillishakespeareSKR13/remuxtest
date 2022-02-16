@@ -27,7 +27,7 @@ export const meta: MetaFunction = ({ data }) => {
   return {
     title: `${me?.profile?.firstName} ${me?.profile?.lastName}`,
     description: `${me?.profile?.firstName} ${me?.profile?.lastName}`,
-    image: `${me?.profile?.photo}`
+    'og:image': `${me?.profile?.photo}`
   };
 };
 export const loader: LoaderFunction = async (data) => AuthAdmin(data);

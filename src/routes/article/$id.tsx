@@ -9,7 +9,7 @@ export const meta: MetaFunction = ({ data }) => {
   return {
     title: `${article.title}`,
     description: `${article.content}`,
-    image: `${article.photo}`
+    'og:image': `${article.photo}`
   };
 };
 export const loader: LoaderFunction = async (data) => AuthArticle(data);
