@@ -82,7 +82,7 @@ export default function Index() {
   const { me, articles } = data;
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
-      {me.id && (
+      {me.id ? (
         <>
           <h1>Welcome to {me?.profile?.firstName}</h1>
           <p>{JSON.stringify(me)}</p>
@@ -108,6 +108,15 @@ export default function Index() {
             </Form>
           </div>
         </>
+      ) : (
+        <Link
+          to={`/login`}
+          style={{
+            width: '300px'
+          }}
+        >
+          iniciar sesion
+        </Link>
       )}
       <div
         style={{

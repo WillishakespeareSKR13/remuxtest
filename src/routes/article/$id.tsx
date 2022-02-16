@@ -31,16 +31,29 @@ export default function Index() {
         flexDirection: 'column'
       }}
     >
-      <h1>Welcome to {me?.profile?.firstName}</h1>
-      <button
-        onClick={() => {
-          Cookies.remove('bearer');
-          window.location.reload();
-        }}
-      >
-        logout
-      </button>
-      <Link to={`/`}>regresar</Link>
+      {me.id ? (
+        <>
+          <h1>Welcome to {me?.profile?.firstName}</h1>
+          <button
+            onClick={() => {
+              Cookies.remove('bearer');
+              window.location.reload();
+            }}
+          >
+            logout
+          </button>
+          <Link to={`/`}>regresar</Link>
+        </>
+      ) : (
+        <Link
+          to={`/login`}
+          style={{
+            width: '300px'
+          }}
+        >
+          iniciar sesion
+        </Link>
+      )}
 
       <div
         style={{
