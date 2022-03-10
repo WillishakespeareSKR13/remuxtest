@@ -1,25 +1,17 @@
-import { GraphQLClient } from 'graphql-request';
-import CONFIG from '~/config';
 import { USER } from '~/apollo/query/user';
-import { createBearer } from '~/routes/login';
 import { IQueryFilter } from '~/types';
 import { client } from '~/apollo';
-import Cookies from 'cookie';
+import AuthApollo from '~/apollo/utils/authApollo';
+import { ApolloQueryResult } from '@apollo/client';
 
 export const GraphQLME = async (request: Request) => {
-  const cookies = Cookies.parse(request.headers.get('cookie') ?? '');
-  const query = await client
+  const { data } = await client
     .query<IQueryFilter<'me'>>({
       query: USER,
-      context: {
-        headers: {
-          authorization: `Bearer ${cookies?.bearer ?? ''}`
-        }
-      }
+      ...AuthApollo(request)
     })
-    .catch((e) => e);
+    .catch(() => ({} as ApolloQueryResult<IQueryFilter<'me'>>));
 
-  // console.log(query);
-  const me = query?.data?.me;
+  const me = data?.me;
   return me ?? null;
 };

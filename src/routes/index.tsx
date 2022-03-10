@@ -153,19 +153,6 @@ export default function Index() {
             <div dangerouslySetInnerHTML={{ __html: article.content }} />
           </Link>
         ))}
-        {articles?.map((article) => (
-          <Link
-            to={`/article/${article.id}`}
-            key={article.id}
-            style={{
-              width: '300px'
-            }}
-          >
-            <h1>{article.title}</h1>
-            <img src={article.photo} alt="" style={{ width: '100%' }} />
-            <div dangerouslySetInnerHTML={{ __html: article.content }} />
-          </Link>
-        ))}
       </div>
     </div>
   );

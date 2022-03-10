@@ -1,7 +1,9 @@
+import { useQuery } from '@apollo/client';
 import Cookies from 'js-cookie';
 import { useLoaderData, LoaderFunction, MetaFunction, Link } from 'remix';
+import { GETARTICLEBYID } from '~/apollo/query/articles';
 import AuthArticle from '~/auth/_article';
-import { IArticle, IMember } from '~/types';
+import { IArticle, IMember, IQueryFilter } from '~/types';
 
 export const meta: MetaFunction = ({ data }) => {
   const user = data as useLoaderDataType;
@@ -17,11 +19,17 @@ export const loader: LoaderFunction = async (data) => AuthArticle(data);
 type useLoaderDataType = {
   me: IMember;
   article: IArticle;
+  id: string;
 };
 
 export default function Index() {
-  const data = useLoaderData<useLoaderDataType>();
-  const { me, article } = data;
+  const { id, me } = useLoaderData<useLoaderDataType>();
+  const { data } = useQuery<IQueryFilter<'articleById'>>(GETARTICLEBYID, {
+    variables: {
+      id: id,
+      viewed: false
+    }
+  });
   return (
     <div
       style={{
@@ -62,9 +70,11 @@ export default function Index() {
           wordBreak: 'break-word'
         }}
       >
-        <h1>{article.title}</h1>
-        <img src={article.photo} alt="" style={{ width: '500px' }} />
-        <div dangerouslySetInnerHTML={{ __html: article.content }} />
+        <h1>{data?.articleById?.title}</h1>
+        <img src={data?.articleById?.photo} alt="" style={{ width: '500px' }} />
+        <div
+          dangerouslySetInnerHTML={{ __html: data?.articleById?.content ?? '' }}
+        />
       </div>
     </div>
   );
