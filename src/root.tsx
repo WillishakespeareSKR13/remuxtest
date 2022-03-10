@@ -8,12 +8,16 @@ import {
 } from 'remix';
 import type { MetaFunction } from 'remix';
 import StylesGlobal from './styles';
+import { useContext } from 'react';
+import ApolloContext from './apollo';
 
 export const meta: MetaFunction = () => {
   return { title: 'New Remix App' };
 };
 
 export default function App() {
+  const initialState = useContext(ApolloContext);
+  console.log('state', initialState);
   return (
     <html lang="en">
       <head>
@@ -30,6 +34,13 @@ export default function App() {
         <Scripts />
         {process.env.NODE_ENV === 'development' && <LiveReload />}
       </body>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.__APOLLO_STATE__=${JSON.stringify(
+            initialState ?? {}
+          )}`.replace(/</g, '\\u003c')
+        }}
+      />
     </html>
   );
 }

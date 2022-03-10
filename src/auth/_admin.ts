@@ -1,40 +1,39 @@
-import { GraphQLClient } from 'graphql-request';
-import { LoaderFunction, redirect } from 'remix';
+import { LoaderFunction } from 'remix';
+import { client } from '~/apollo';
 import { ARTICLES } from '~/apollo/query/articles';
-import CONFIG from '~/config';
-import { createBearer } from '~/routes/login';
 import { IQueryFilter } from '~/types';
 import { GraphQLME } from './__auth';
+import Cookies from 'cookie';
 
 const AuthAdmin: LoaderFunction = async ({ request }) => {
   const me = await GraphQLME(request);
-  const bearer = await createBearer.parse(request.headers.get('Cookie') ?? '');
-  const graphQLClient = new GraphQLClient(CONFIG.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${bearer}`
-    }
-  });
-
-  const query = await graphQLClient
-    .request<IQueryFilter<'listArticles'>>(ARTICLES, {
-      filter: {
-        projectId: {
-          eq: 'b6341425-7c7b-45bd-939a-dc15db168d62'
+  const cookies = Cookies.parse(request.headers.get('cookie') ?? '');
+  const query = await client
+    .query<IQueryFilter<'listArticles'>>({
+      query: ARTICLES,
+      variables: {
+        filter: {
+          projectId: {
+            eq: 'b6341425-7c7b-45bd-939a-dc15db168d62'
+          }
+        },
+        order: {
+          createdAt: 'DESC'
         }
       },
-      order: {
-        createdAt: 'DESC'
+      context: {
+        headers: {
+          authorization: `Bearer ${cookies?.bearer ?? ''}`
+        }
       }
     })
-    .catch((e) => e.response.data);
+    .catch(() => null);
 
-  // if (!me) {
-  //   return redirect('/login');
-  // }
+  const articles = query?.data?.listArticles?.items ?? [];
 
   return {
     me: me ?? {},
-    articles: query?.listArticles?.items ?? []
+    articles: articles
   };
 };
 

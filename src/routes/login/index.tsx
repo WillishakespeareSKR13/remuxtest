@@ -30,7 +30,6 @@ const Wrapper = styled(motion.div)`
     max-width: 400px;
     margin-bottom: 20px;
   }
-  }
 `;
 
 const Input = styled(motion.input)`
@@ -99,7 +98,7 @@ export const action: ActionFunction = async (DataFunction) => {
     const { loginMember } = query;
     return redirect('/login', {
       headers: {
-        'Set-Cookie': await createBearer.serialize(loginMember.accessToken)
+        'Set-Cookie': `bearer=${loginMember.accessToken};`
       }
     });
   }

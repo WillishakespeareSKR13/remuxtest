@@ -1,4 +1,3 @@
-import { GraphQLClient } from 'graphql-request';
 import Cookies from 'js-cookie';
 import {
   useLoaderData,
@@ -11,15 +10,17 @@ import {
   Link
 } from 'remix';
 import AuthAdmin from '~/auth/_admin';
-import CONFIG from '~/config';
 import { CREATEARTICLES } from '~/apollo/mutation/articles';
 import {
   IArticle,
   ICreateArticleInput,
   IMember,
-  IMutationFilter
+  IMutationFilter,
+  IQueryFilter
 } from '~/types';
-import { createBearer } from './login';
+import { client } from '~/apollo';
+import { useQuery } from '@apollo/client';
+import { ARTICLES } from '~/apollo/query/articles';
 
 export const meta: MetaFunction = ({ data }) => {
   const user = data as useLoaderDataType;
@@ -40,31 +41,27 @@ export const action: ActionFunction = async (DataFunction) => {
   const content = formData.get('content');
   const image = formData.get('image');
 
-  const bearer = await createBearer.parse(request.headers.get('Cookie') ?? '');
-  const graphQLClient = new GraphQLClient(CONFIG.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${bearer}`
-    }
-  });
-
-  const query = await graphQLClient
-    .request<IMutationFilter<'loginMember'>>(CREATEARTICLES, {
-      input: {
-        projectId: 'b6341425-7c7b-45bd-939a-dc15db168d62',
-        categories: [],
-        title: `${title}`,
-        tags: [],
-        photo: `${image}`,
-        content: `${content}`,
-        slug: '',
-        seoTitle: '',
-        seoDescription: '',
-        seoKeywords: '',
-        structuredMarking: '',
-        status: 'PUBLISHED',
-        releaseDate: '',
-        imageAlt: ''
-      } as ICreateArticleInput
+  const query = await client
+    .query<IMutationFilter<'loginMember'>>({
+      query: CREATEARTICLES,
+      variables: {
+        input: {
+          projectId: 'b6341425-7c7b-45bd-939a-dc15db168d62',
+          categories: [],
+          title: `${title}`,
+          tags: [],
+          photo: `${image}`,
+          content: `${content}`,
+          slug: '',
+          seoTitle: '',
+          seoDescription: '',
+          seoKeywords: '',
+          structuredMarking: '',
+          status: 'PUBLISHED',
+          releaseDate: '',
+          imageAlt: ''
+        } as ICreateArticleInput
+      }
     })
     .catch((e) => e.response.data);
   console.log(query);
@@ -81,6 +78,21 @@ export default function Index() {
   const transition = useTransition();
   const data = useLoaderData<useLoaderDataType>();
   const { me, articles } = data;
+  const { data: ArticlesClient } = useQuery<IQueryFilter<'listArticles'>>(
+    ARTICLES,
+    {
+      variables: {
+        filter: {
+          projectId: {
+            eq: 'b6341425-7c7b-45bd-939a-dc15db168d62'
+          }
+        },
+        order: {
+          createdAt: 'DESC'
+        }
+      }
+    }
+  );
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', lineHeight: '1.4' }}>
       {me.id ? (
@@ -128,6 +140,19 @@ export default function Index() {
           gap: '50px'
         }}
       >
+        {ArticlesClient?.listArticles?.items?.map((article) => (
+          <Link
+            to={`/article/${article.id}`}
+            key={article.id}
+            style={{
+              width: '300px'
+            }}
+          >
+            <h1>{article.title}</h1>
+            <img src={article.photo} alt="" style={{ width: '100%' }} />
+            <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          </Link>
+        ))}
         {articles?.map((article) => (
           <Link
             to={`/article/${article.id}`}

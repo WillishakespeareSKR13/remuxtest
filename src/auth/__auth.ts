@@ -3,18 +3,23 @@ import CONFIG from '~/config';
 import { USER } from '~/apollo/query/user';
 import { createBearer } from '~/routes/login';
 import { IQueryFilter } from '~/types';
+import { client } from '~/apollo';
+import Cookies from 'cookie';
 
 export const GraphQLME = async (request: Request) => {
-  const bearer = await createBearer.parse(request.headers.get('Cookie') ?? '');
+  const cookies = Cookies.parse(request.headers.get('cookie') ?? '');
+  const query = await client
+    .query<IQueryFilter<'me'>>({
+      query: USER,
+      context: {
+        headers: {
+          authorization: `Bearer ${cookies?.bearer ?? ''}`
+        }
+      }
+    })
+    .catch((e) => e);
 
-  const graphQLClient = new GraphQLClient(CONFIG.GRAPHQL_URL, {
-    headers: {
-      authorization: `Bearer ${bearer}`
-    }
-  });
-
-  const query = await graphQLClient
-    .request<IQueryFilter<'me'>>(USER)
-    .catch(() => null);
-  return query?.me ?? null;
+  // console.log(query);
+  const me = query?.data?.me;
+  return me ?? null;
 };

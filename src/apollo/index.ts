@@ -1,19 +1,21 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
-import cookie from 'js-cookie';
 import CONFIG from '~/config';
+import Cookies from 'js-cookie';
+import { createContext } from 'react';
 
-const cache = new InMemoryCache();
+const isBrowser = typeof window !== 'undefined';
+const initalState = isBrowser ? window.__APOLLO_STATE__ : undefined;
 
 const httpLink = createHttpLink({
   uri: `${CONFIG.GRAPHQL_URL}`
 });
 
-const authLink = setContext((_, { headers }) => ({
+const authLink = setContext(async (_, { headers }) => ({
   headers: {
-    ...headers,
-    authorization: `Bearer ${cookie.get(`bearer`)}`
+    authorization: `Bearer ${Cookies.get('bearer')}`,
+    ...headers
   }
 }));
 
@@ -32,12 +34,12 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const link = errorLink.concat(authLink.concat(httpLink));
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link,
-  ssrMode: true,
-  cache,
+  ssrMode: isBrowser,
+  cache: new InMemoryCache().restore(initalState),
   connectToDevTools: true,
   queryDeduplication: true
 });
 
-export default client;
+export default createContext(initalState);
